@@ -35,6 +35,20 @@ import com.bezkoder.spring.restapi.service.TutorialService;
 
 import java.io.ByteArrayOutputStream;
 
+
+
+//----------------------------------------------------------------
+//   1. 사용이력을 남기고 싶다면? 
+//   2. "ch_order_name"의 공란을 없앨것인지 판단필요, 즉 기존 거래처코드를 100%신뢰를 할 수 있는지 확인 필요 
+//   3. 엑셀 열너비 조정 필요 
+//   4. 한글의 경우 한글자당 3byte를 잡아먹어서 5글자만되도 15byte로 반영됨 
+//   5. TT구분할까요? 외국거래처에 대해서 
+//   6. 큐어라벨의 경우, 카카오톡스토어와 카카오톡선물하기 코드가 같으므로 비고란에 스토어/선물하기로 표기
+
+
+
+//----------------------------------------------------------------
+
 @RestController
 @RequestMapping("/api")
 public class TutorialController {
@@ -54,19 +68,29 @@ public class TutorialController {
 		STATIC_DATA.put("카카오톡스토어", "00425");
 		STATIC_DATA.put("쿠팡", "00194");
 		STATIC_DATA.put("펫프렌즈", "100152");
-		STATIC_DATA.put("카카오톡선물하기", "004251");
+		STATIC_DATA.put("카카오톡선물하기", "00425");
 	}
 
 	// static 블록을 사용하여 초기 데이터 삽입
 	static {
-		STATIC_DATA2.put("Cafe24(신) 유튜브쇼핑", "100091");
-		STATIC_DATA2.put("고도몰5", "100108");
-		STATIC_DATA2.put("스마트스토어", "100113");
-		STATIC_DATA2.put("아임웹", "00698");
-		STATIC_DATA2.put("카카오톡스토어", "00425");
-		STATIC_DATA2.put("쿠팡", "00194");
-		STATIC_DATA2.put("펫프렌즈", "100152");
-		STATIC_DATA2.put("카카오톡선물하기", "004251");
+		STATIC_DATA2.put("고도몰5", "1000000003");
+		STATIC_DATA2.put("카카오톡선물하기", "1000000331");
+		STATIC_DATA2.put("SK스토어", "03549");
+		STATIC_DATA2.put("GS shop", "02926");
+		STATIC_DATA2.put("Wconcept", "02698");
+		STATIC_DATA2.put("신세계몰(신)", "02603");
+		STATIC_DATA2.put("롯데온", "02554");
+		STATIC_DATA2.put("카카오톡스토어", "02490");
+		STATIC_DATA2.put("스마트스토어", "02363");
+		STATIC_DATA2.put("신세계몰(신)", "02285");
+		STATIC_DATA2.put("K쇼핑", "01552");
+		STATIC_DATA2.put("홈&쇼핑", "00649");
+		STATIC_DATA2.put("NS홈쇼핑(신)", "00343");
+		STATIC_DATA2.put("롯데홈쇼핑(신)", "00341");
+		STATIC_DATA2.put("현대홈쇼핑(3)", "00251");
+		STATIC_DATA2.put("CJ온스타일", "00250");
+		STATIC_DATA2.put("쿠팡", "03985");
+		STATIC_DATA2.put("AliExpress", "1000001491");	
 	}
 
 	@GetMapping("/tutorials")
@@ -159,6 +183,7 @@ public class TutorialController {
 
 			if (i == 2) {
 				headerRow.setHeightInPoints(160); // 높이를 30포인트로 설정
+				
 			}
 
 			for (int j = 0; j < nested.size(); j++) {
@@ -174,12 +199,16 @@ public class TutorialController {
 			Row row = sheet.createRow(i + 3);
 
 			row.createCell(0).setCellValue(0);
+			
+			row.createCell(1).setCellValue(begin_date);
 
-			row.createCell(1).setCellValue(begin_date.substring(0, 4).concat("-").concat(begin_date.substring(4, 6))
-					.concat("-").concat(begin_date.substring(6, 8)));
+//			row.createCell(1).setCellValue(begin_date.substring(0, 4).concat("-").concat(begin_date.substring(4, 6)) + 다시사용안해도 엑셀업로드됨  
+//					.concat("-").concat(begin_date.substring(6, 8)));
 
 			try {
-				row.createCell(2).setCellValue(Integer.valueOf((String) excelDataList.get(i).get("ch_order_name")));
+//				row.createCell(2).setCellValue(Integer.valueOf((String) excelDataList.get(i).get("ch_order_name"))); + 추가 텍스트값으로 해야함 안그러면 00이 숫자로 인식해서 엑셀변환시 안나타남
+				row.createCell(2).setCellValue(((String) excelDataList.get(i).get("ch_order_name")));
+			
 			} catch (Exception e) {
 				row.createCell(2).setCellValue("");
 			}
@@ -200,7 +229,8 @@ public class TutorialController {
 			}
 
 			try {
-				row.createCell(8).setCellValue(Integer.valueOf((String) excelDataList.get(i).get("expireDay")));
+     			row.createCell(8).setCellValue(Integer.valueOf((String) excelDataList.get(i).get("expireDay")));
+	
 			} catch (Exception e) {
 				row.createCell(8).setCellValue("-");
 			}
@@ -218,6 +248,8 @@ public class TutorialController {
 			row.createCell(14).setCellValue("008");
 
 			row.createCell(15).setCellValue("");
+			
+			row.createCell(16).setCellValue((Integer) excelDataList.get(i).get("row_id"));
 		}
 
 		// Excel 파일을 ByteArray로 변환
@@ -253,8 +285,8 @@ public class TutorialController {
 
 			// "data" 키에 들어갈 중첩 Map 생성
 			Map<String, Object> data = new HashMap<>();
-			data.put("begin_date", begin_date);
-			data.put("end_date", begin_date);
+     		data.put("begin_date", begin_date);
+	     	data.put("end_date", begin_date);
 			data.put("ord_kind1", "0100");
 			data.put("warehouse_list", "AFAX");
 			data.put("category1", category1);
@@ -321,6 +353,9 @@ public class TutorialController {
 					} else if ("D".equals(sheifLiftUnit)) {
 						lotDate = lotDate.plusDays(sheifLift).minusDays(1);
 						expireDay = lotDate.format(formatter);
+					} else if ("Y".equalsIgnoreCase(sheifLiftUnit)) { //                      ++ 연도 추가
+					    lotDate = lotDate.plusYears(sheifLift).minusDays(1);
+					    expireDay = lotDate.format(formatter);
 					}
 				}
 
